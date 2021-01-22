@@ -70,17 +70,6 @@ export const removePostRequestAction = (data) => ({
   data,
 });
 
-const dummyPostData = (data) => ({
-  id: data.id,
-  content: data.content.content,
-  User: {
-    id: 1,
-    nickname: data.content.nickname,
-  },
-  Images: [],
-  Comments: [],
-});
-
 // 이전 상태를 액션을 통해 다음 상태로 만들어 내는 함수 (불변성 꼭 지켜야 함.)
 const postReduce = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
@@ -111,11 +100,11 @@ const postReduce = (state = initialState, action) => produce(state, (draft) => {
 
       break;
     case ADD_POST_SUCCESS:
-      // draft.mainPosts = [dummyPostData(action.data), ...state.mainPosts];
-      draft.mainPosts.unshift(dummyPostData(action.data));
+      console.log(action.data);
       draft.addPostLoading = false;
       draft.addPostComplete = true;
       draft.addPostError = null;
+      draft.mainPosts.unshift(action.data.data);
 
       break;
     case ADD_POST_FAILURE:
@@ -131,16 +120,8 @@ const postReduce = (state = initialState, action) => produce(state, (draft) => {
 
       break;
     case ADD_COMMENT_SUCCESS: {
-      const post = draft.mainPosts.find((v) => v.id === action.data.postId);
-      post.Comments.unshift(
-        {
-          User: {
-            nickname: 'Immer 닉네임',
-          },
-          content: action.data.content,
-        },
-      );
-
+      const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+      post.Comments.unshift(action.data);
       draft.addCommentLoading = false;
       draft.addCommentComplete = true;
       draft.addCommentError = null;

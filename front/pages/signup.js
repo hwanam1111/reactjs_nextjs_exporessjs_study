@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Head from 'next/head';
+import Router from 'next/router';
 import { Form, Input, Checkbox, Button } from 'antd';
 import styled from 'styled-components';
 
@@ -14,6 +15,27 @@ const ErrorMessage = styled.div`
 `;
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const { signupLoading, signupComplete, signupError, loginComplete } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (signupComplete) {
+      Router.replace('/');
+    }
+  }, [signupComplete]);
+
+  useEffect(() => {
+    if (signupError) {
+      alert('이미 사용중인 이메일입니다');
+    }
+  }, [signupError]);
+
+  useEffect(() => {
+    if (loginComplete) {
+      Router.replace('/');
+    }
+  }, [loginComplete]);
+
   const [email, onChangeUserEmail] = useInput('');
   const [nickname, onChangeUserNickname] = useInput('');
   const [password, onChangeUserPassword] = useInput('');
@@ -34,8 +56,6 @@ const Signup = () => {
     setTermError(!evt.target.checked);
   }, []);
 
-  const dispatch = useDispatch();
-  const { signupLoading } = useSelector((state) => state.user);
   const onSubmitHandler = useCallback(() => {
     if (password !== passwordCheck) {
       return setPasswordCheckError(true);

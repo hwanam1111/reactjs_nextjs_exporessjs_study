@@ -32,11 +32,10 @@ const PostForm = () => {
     imageInput.current.click();
   }, [imageInput.current]);
 
-  const { me } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const onSubmitPostForm = useCallback(() => {
-    dispatch(addPostRequestAction({ content: text, nickname: me.nickname }));
-  }, [text, me]);
+    dispatch(addPostRequestAction({ content: text }));
+  }, [text]);
 
   return (
     <FormWrapper encType="multipart/form-data" onFinish={onSubmitPostForm}>

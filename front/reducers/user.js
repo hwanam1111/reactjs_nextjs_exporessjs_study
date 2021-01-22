@@ -36,6 +36,8 @@ export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
+export const SIGN_UP_RESET_COMPLETE = 'SIGN_UP_RESET_COMPLETE';
+
 export const CHANGE_NICKNAME_REQUEST = 'CHANGE_NICKNAME_REQUEST';
 export const CHANGE_NICKNAME_SUCCESS = 'CHANGE_NICKNAME_SUCCESS';
 export const CHANGE_NICKNAME_FAILURE = 'CHANGE_NICKNAME_FAILURE';
@@ -65,6 +67,10 @@ export const signupRequestAction = (data) => ({
   data,
 });
 
+export const signupResetCompleteAction = () => ({
+  type: SIGN_UP_RESET_COMPLETE,
+});
+
 export const changeNicknameAction = (data) => ({
   type: CHANGE_NICKNAME_REQUEST,
   data,
@@ -92,7 +98,15 @@ const userReduce = (state = initialState, action) => produce(state, (draft) => {
       draft.loginLoading = false;
       draft.loginComplete = true;
       draft.loginError = null;
-      draft.me = action.data.dummyUserData;
+      draft.me = action.data;
+      // draft.me = {
+      //   id: action.data.id,
+      //   email: action.data.email,
+      //   nickname: '',
+      //   Posts: [],
+      //   Followings: [],
+      //   Followers: [],
+      // };
 
       break;
     case LOG_IN_FAILURE:
@@ -137,6 +151,10 @@ const userReduce = (state = initialState, action) => produce(state, (draft) => {
       draft.signupLoading = false;
       draft.signupComplete = false;
       draft.signupError = action.error;
+
+      break;
+    case SIGN_UP_RESET_COMPLETE:
+      draft.signupComplete = false;
 
       break;
     case CHANGE_NICKNAME_REQUEST:

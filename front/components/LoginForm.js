@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Input, Button } from 'antd';
 import styled from 'styled-components';
@@ -16,26 +16,20 @@ const ButtonWrapper = styled.div`
 `;
 
 const LoginForm = () => {
-  const { loginLoading } = useSelector((state) => state.user);
+  const { loginLoading, loginError } = useSelector((state) => state.user);
 
   const [email, onChangeEmailHandler] = useInput('');
   const [password, onChangePasswordHandler] = useInput('');
 
+  useEffect(() => {
+    if (loginError) {
+      alert(loginError);
+    }
+  }, [loginError]);
+
   const dispatch = useDispatch();
   const onSubmitFormHandler = useCallback(() => {
-    const dummyUserData = {
-      nickname: email,
-      id: 1,
-      Posts: [
-        {
-          id: 1,
-        },
-      ],
-      Followings: [{ nickname: '가가가' }, { nickname: '나나나' }, { nickname: '다다다' }],
-      Followers: [{ nickname: '라라라' }, { nickname: '마마마' }, { nickname: '바바바' }, { nickname: '사사사' }],
-    };
-
-    dispatch(loginRequestAction({ email, password, dummyUserData }));
+    dispatch(loginRequestAction({ email, password }));
   }, [email, password]);
 
   return (

@@ -28,6 +28,10 @@ export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
+
 export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
 export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
 export const LOG_OUT_FAILURE = 'LOG_OUT_FAILURE';
@@ -36,7 +40,7 @@ export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
-export const SIGN_UP_RESET_COMPLETE = 'SIGN_UP_RESET_COMPLETE';
+export const SIGN_UP_RESET = 'SIGN_UP_RESET';
 
 export const CHANGE_NICKNAME_REQUEST = 'CHANGE_NICKNAME_REQUEST';
 export const CHANGE_NICKNAME_SUCCESS = 'CHANGE_NICKNAME_SUCCESS';
@@ -58,6 +62,11 @@ export const loginRequestAction = (data) => ({
   data,
 });
 
+export const loadMyInfoRequestAction = (data) => ({
+  type: LOAD_MY_INFO_REQUEST,
+  data,
+});
+
 export const logoutRequestAction = () => ({
   type: LOG_OUT_REQUEST,
 });
@@ -68,7 +77,7 @@ export const signupRequestAction = (data) => ({
 });
 
 export const signupResetCompleteAction = () => ({
-  type: SIGN_UP_RESET_COMPLETE,
+  type: SIGN_UP_RESET,
 });
 
 export const changeNicknameAction = (data) => ({
@@ -99,14 +108,6 @@ const userReduce = (state = initialState, action) => produce(state, (draft) => {
       draft.loginComplete = true;
       draft.loginError = null;
       draft.me = action.data;
-      // draft.me = {
-      //   id: action.data.id,
-      //   email: action.data.email,
-      //   nickname: '',
-      //   Posts: [],
-      //   Followings: [],
-      //   Followers: [],
-      // };
 
       break;
     case LOG_IN_FAILURE:
@@ -114,6 +115,20 @@ const userReduce = (state = initialState, action) => produce(state, (draft) => {
       draft.loginComplete = false;
       draft.loginError = action.error;
 
+      break;
+    case LOAD_MY_INFO_REQUEST:
+
+      break;
+    case LOAD_MY_INFO_SUCCESS:
+      draft.loginLoading = false;
+      draft.loginComplete = true;
+      draft.loginError = null;
+      draft.me = action.data;
+
+      break;
+    case LOAD_MY_INFO_FAILURE:
+
+      draft.loginError = action.error;
       break;
     case LOG_OUT_REQUEST:
       draft.logoutLoading = true;
@@ -153,7 +168,7 @@ const userReduce = (state = initialState, action) => produce(state, (draft) => {
       draft.signupError = action.error;
 
       break;
-    case SIGN_UP_RESET_COMPLETE:
+    case SIGN_UP_RESET:
       draft.signupComplete = false;
 
       break;
@@ -167,6 +182,7 @@ const userReduce = (state = initialState, action) => produce(state, (draft) => {
       draft.changeNicknameLoading = false;
       draft.changeNicknameComplete = true;
       draft.changeNicknameError = null;
+      draft.me.nickname = action.data.nickname;
 
       break;
     case CHANGE_NICKNAME_FAILURE:
@@ -218,7 +234,7 @@ const userReduce = (state = initialState, action) => produce(state, (draft) => {
 
       break;
     case REMOVE_POST_OF_ME: {
-      draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data);
+      draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data.PostId);
 
       break;
     }

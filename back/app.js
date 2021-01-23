@@ -4,9 +4,11 @@ const passport = require('passport');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 
-const postRouter = require('./routes/post');
 const userRouter = require('./routes/user');
+const postRouter = require('./routes/post');
+const postsRouter = require('./routes/posts');
 const db = require('./models');
 const passportConfig = require('./passport');
 
@@ -23,6 +25,7 @@ db.sequelize.sync()
   // router 보다 위에
 passportConfig();
 
+app.use(morgan('dev'));
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
@@ -44,6 +47,7 @@ app.get('/', (req, res) => {
 
 app.use('/user', userRouter);
 app.use('/post', postRouter);
+app.use('/posts', postsRouter);
 
 app.listen(3065, () => {
   console.log('서버 실행중.');

@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Post.associate = (db) => {
     db.Post.belongsTo(db.User);
-    db.User.belongsToMany(db.User, { through: 'TB_LIKE', as: 'PostLikers' });
+    db.Post.belongsToMany(db.User, { through: 'TB_LIKE', as: 'PostLikers' });
     db.Post.belongsToMany(db.Hashtag, { through: 'TB_POST_HASHTAG' } );
     db.Post.belongsTo(db.Post, { as: 'RetweetId' });
     db.Post.hasMany(db.Comment);

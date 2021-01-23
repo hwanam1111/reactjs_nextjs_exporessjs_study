@@ -7,6 +7,39 @@ const { needToLogin, shouldNotBeLoggedIn } = require('./middlewares');
 
 const router = express.Router();
 
+router.get('/', async (req, res, next) => { // get /user
+  try {
+    if (req.user) {
+      const userInfoWithoutPassword = await User.findOne({
+        where: { id: req.user.id },
+        attributes: ['id', 'email', 'nickname'],
+        include: [
+          {
+            model: Post,
+            attributes: ['id'],
+          }, 
+          {
+            model: User,
+            as: 'Followers',
+          },
+          {
+            model: User,
+            as: 'Followings',
+          },
+        ]
+      });
+
+      res.status(200).json(userInfoWithoutPassword);
+    }
+    else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+})
+
 router.post('/signup', shouldNotBeLoggedIn, async (req, res, next) => {  
   try {
     const exUser = await User.findOne({
@@ -57,6 +90,7 @@ router.post('/login', shouldNotBeLoggedIn, (req, res, next) => {
         include: [
           {
             model: Post,
+            attributes: ['id'],
           }, 
           {
             model: User,
@@ -73,6 +107,24 @@ router.post('/login', shouldNotBeLoggedIn, (req, res, next) => {
     });
   })(req, res, next);
 });
+
+router.patch('/change_nickname', needToLogin, async (req, res, next) => {
+  try {
+    await User.update({
+      nickname: req.body.nickname,
+    },
+    {
+      where: {
+        id: req.user.id,
+      },
+    });
+
+    res.status(200).json({ nickname: req.body.nickname });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+})
 
 router.post('/logout', needToLogin, (req, res, next) => {
   req.logout();

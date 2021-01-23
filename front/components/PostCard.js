@@ -5,7 +5,7 @@ import { Card, Popover, Button, Avatar, List, Comment } from 'antd';
 import { RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined, HeartTwoTone } from '@ant-design/icons';
 import styled from 'styled-components';
 
-import { REMOVE_POST_REQUEST } from '../reducers/post';
+import { POST_LIKED_REQUEST, POST_UNLIKED_REQUEST, REMOVE_POST_REQUEST } from '../reducers/post';
 
 import PostImages from './PostImages';
 import PostCardContent from './PostCardContent';
@@ -20,16 +20,38 @@ const CardItemListWrapper = styled.div`
 `;
 
 const PostCard = ({ post }) => {
-  const { me } = useSelector((state) => state.user);
-  const { removePostLoading } = useSelector((state) => state.post);
-  const meId = me?.id; // optional chaining 연산자
+  const dispatch = useDispatch();
 
-  const [liked, setLiked] = useState(false);
-  const onToggleLike = useCallback(() => {
-    setLiked((prevData) => !prevData);
+  const { me } = useSelector((state) => state.user);
+  const meId = me?.id; // optional chaining 연산자
+  const { removePostLoading } = useSelector((state) => state.post);
+
+  const onClickLike = useCallback(() => {
+    if (me && meId) {
+      dispatch({
+        type: POST_LIKED_REQUEST,
+        data: {
+          postId: post.id,
+        },
+      });
+    } else {
+      alert('로그인 후 좋아요가 가능합니다.');
+    }
   }, []);
 
-  const dispatch = useDispatch();
+  const onClickUnLike = useCallback(() => {
+    if (me && meId) {
+      dispatch({
+        type: POST_UNLIKED_REQUEST,
+        data: {
+          postId: post.id,
+        },
+      });
+    } else {
+      alert('로그인 후 좋아요가 가능합니다.');
+    }
+  }, []);
+
   const onClickDeleteBtn = useCallback(() => {
     dispatch({
       type: REMOVE_POST_REQUEST,
@@ -42,13 +64,15 @@ const PostCard = ({ post }) => {
     setCommentFormOpend((prevData) => !prevData);
   }, []);
 
+  const liked = post.PostLikers.find((v) => v.id === meId);
+
   return (
     <CardItemListWrapper>
       <Card
         cover={post.Images.length !== 0 && <PostImages images={post.Images} />}
         actions={[
           <RetweetOutlined key="retweet" />,
-          liked ? <HeartTwoTone twoToneColor="#eb2f96" key="header" onClick={onToggleLike} /> : <HeartOutlined key="header" onClick={onToggleLike} />,
+          liked ? <HeartTwoTone twoToneColor="#eb2f96" key="header" onClick={onClickUnLike} /> : <HeartOutlined key="header" onClick={onClickLike} />,
           <MessageOutlined key="comment" onClick={onToggleCommentOpen} />,
           <Popover
             key="more"
@@ -117,9 +141,10 @@ PostCard.propTypes = {
     id: PropTypes.number,
     User: PropTypes.object,
     content: PropTypes.string,
-    createdAt: PropTypes.object,
+    createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
+    PostLikers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 

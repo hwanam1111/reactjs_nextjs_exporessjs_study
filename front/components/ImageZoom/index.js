@@ -27,7 +27,7 @@ const ImageZoom = ({ images, onClose }) => {
             {
               images.map((v) => (
                 <ImageWrapper key={v.src}>
-                  <img className="image" src={v.src} alt="이미지 확대" />
+                  <img className="image" src={`http://localhost:3065/${v.src}`} alt="이미지 확대" />
                 </ImageWrapper>
               ))
             }

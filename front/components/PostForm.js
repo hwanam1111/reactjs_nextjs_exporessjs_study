@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Form, Input, Button } from 'antd';
 import styled from 'styled-components';
 import useInput from '../hooks/useinput';
-import { addPostRequestAction } from '../reducers/post';
+import { UPLOAD_IMAGES_REQUEST, REMOVE_IMAGE, ADD_POST_REQUEST } from '../reducers/post';
 
 const FormWrapper = styled(Form)`
   margin: 20px;
@@ -18,6 +18,8 @@ const Image = styled.img`
 `;
 
 const PostForm = () => {
+  const dispatch = useDispatch();
+
   const { imagePaths, addPostLoading, addPostComplete } = useSelector((state) => state.post);
   const [text, onChangeText, setText] = useInput('');
 
@@ -32,26 +34,58 @@ const PostForm = () => {
     imageInput.current.click();
   }, [imageInput.current]);
 
-  const dispatch = useDispatch();
+  const onChangeImage = useCallback((evt) => {
+    const imageFormData = new FormData();
+    [].forEach.call(evt.target.files, (f) => {
+      imageFormData.append('image', f);
+    });
+
+    dispatch({
+      type: UPLOAD_IMAGES_REQUEST,
+      data: imageFormData,
+    });
+  }, []);
+
+  const onRemoveImage = useCallback((imageIndex) => () => {
+    dispatch({
+      type: REMOVE_IMAGE,
+      data: imageIndex,
+    });
+  }, []);
+
   const onSubmitPostForm = useCallback(() => {
-    dispatch(addPostRequestAction({ content: text }));
-  }, [text]);
+    if (!text || !text.trim()) {
+      return alert('게시글을 입력해주세요.');
+    }
+
+    const formData = new FormData();
+
+    imagePaths.forEach((p) => {
+      formData.append('image', p);
+    });
+    formData.append('content', text);
+
+    return dispatch({
+      type: ADD_POST_REQUEST,
+      data: formData,
+    });
+  }, [text, imagePaths]);
 
   return (
     <FormWrapper encType="multipart/form-data" onFinish={onSubmitPostForm}>
       <Input.TextArea value={text} onChange={onChangeText} placeholder="게시글을 입력해주세요" />
       <div>
-        <input type="file" ref={imageInput} multiple hidden />
+        <input type="file" name="image" ref={imageInput} multiple hidden onChange={onChangeImage} />
         <Button htmlType="button" onClick={onClickImageUploadBtn}>이미지 업로드</Button>
         <Button type="primary" htmlType="submit" loading={addPostLoading}>작성하기</Button>
       </div>
       <div>
         {
-          imagePaths.map((v) => (
+          imagePaths.map((v, i) => (
             <ImageWrraper key={v}>
-              <Image src={v} alt="이미지" title="이미지" />
+              <Image src={`http://localhost:3065/${v}`} alt="이미지" title="이미지" />
               <div>
-                <Button>제거</Button>
+                <Button onClick={onRemoveImage(i)}>제거</Button>
               </div>
             </ImageWrraper>
           ))

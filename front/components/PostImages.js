@@ -30,7 +30,7 @@ const PostImages = ({ images }) => {
   if (images.length === 1) {
     return (
       <>
-        <img role="presentation" src={images[0].src} alt="이미지" onClick={onImageZoom} />
+        <img role="presentation" src={`http://localhost:3065/${images[0].src}`} alt="이미지" onClick={onImageZoom} />
         {showImageZoom && <ImageZoom images={images} onClose={onClose} />}
       </>
     );
@@ -40,8 +40,8 @@ const PostImages = ({ images }) => {
     return (
       <>
         <PostImagesCoverWrapper>
-          <img role="presentation" width="49.9%" src={images[0].src} alt="이미지" onClick={onImageZoom} />
-          <img role="presentation" width="49.9%" src={images[1].src} alt="이미지" onClick={onImageZoom} />
+          <img role="presentation" width="49.9%" src={`http://localhost:3065/${images[0].src}`} alt="이미지" onClick={onImageZoom} />
+          <img role="presentation" width="49.9%" src={`http://localhost:3065/${images[1].src}`} alt="이미지" onClick={onImageZoom} />
         </PostImagesCoverWrapper>
         {showImageZoom && <ImageZoom images={images} onClose={onClose} />}
       </>
@@ -51,7 +51,7 @@ const PostImages = ({ images }) => {
   return (
     <>
       <PostImagesCoverWrapper>
-        <img role="presentation" width="49.9%" src={images[0].src} alt="이미지" onClick={onImageZoom} />
+        <img role="presentation" width="49.9%" src={`http://localhost:3065/${images[0].src}`} alt="이미지" onClick={onImageZoom} />
         <ImageMoreViewWrapper
           role="presentation"
           onClick={onImageZoom}

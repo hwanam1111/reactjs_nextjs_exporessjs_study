@@ -5,7 +5,7 @@ import { Card, Popover, Button, Avatar, List, Comment } from 'antd';
 import { RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined, HeartTwoTone } from '@ant-design/icons';
 import styled from 'styled-components';
 
-import { POST_LIKED_REQUEST, POST_UNLIKED_REQUEST, REMOVE_POST_REQUEST } from '../reducers/post';
+import { POST_LIKED_REQUEST, POST_UNLIKED_REQUEST, RETWEET_REQUEST, REMOVE_POST_REQUEST } from '../reducers/post';
 
 import PostImages from './PostImages';
 import PostCardContent from './PostCardContent';
@@ -64,6 +64,21 @@ const PostCard = ({ post }) => {
     setCommentFormOpend((prevData) => !prevData);
   }, []);
 
+  const onRetweet = useCallback(() => {
+    if (!meId) {
+      return alert('로그인이 필요합니다.');
+    }
+
+    if (meId === post.User.id) {
+      return alert('내 게시글은 리트윗 할 수 없습니다.');
+    }
+
+    return dispatch({
+      type: RETWEET_REQUEST,
+      data: post.id,
+    });
+  }, []);
+
   const liked = post.PostLikers.find((v) => v.id === meId);
 
   return (
@@ -71,7 +86,7 @@ const PostCard = ({ post }) => {
       <Card
         cover={post.Images.length !== 0 && <PostImages images={post.Images} />}
         actions={[
-          <RetweetOutlined key="retweet" />,
+          <RetweetOutlined key="retweet" onClick={onRetweet} />,
           liked ? <HeartTwoTone twoToneColor="#eb2f96" key="header" onClick={onClickUnLike} /> : <HeartOutlined key="header" onClick={onClickLike} />,
           <MessageOutlined key="comment" onClick={onToggleCommentOpen} />,
           <Popover
@@ -98,15 +113,32 @@ const PostCard = ({ post }) => {
             <EllipsisOutlined />
           </Popover>,
         ]}
+        title={post.RetweetId ? `${post.User.nickname}님이 리트윗 했습니다.` : null}
         extra={
           (meId && meId !== post.User.id) && <FollowButton post={post} />
         }
       >
-        <Card.Meta
-          avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
-          title={post.User.nickname}
-          description={<PostCardContent postData={post.content} />}
-        />
+        {post.RetweetId
+          ? (
+            <Card
+              cover={
+                post.RetweetId.Images.length !== 0 && <PostImages images={post.RetweetId.Images} />
+              }
+            >
+              <Card.Meta
+                avatar={<Avatar>{post.RetweetId.User.nickname[0]}</Avatar>}
+                title={post.RetweetId.User.nickname}
+                description={<PostCardContent postData={post.RetweetId.content} />}
+              />
+            </Card>
+          )
+          : (
+            <Card.Meta
+              avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+              title={post.User.nickname}
+              description={<PostCardContent postData={post.content} />}
+            />
+          )}
       </Card>
       {
         commentFormOpend && (
@@ -145,6 +177,7 @@ PostCard.propTypes = {
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
     PostLikers: PropTypes.arrayOf(PropTypes.object),
+    RetweetId: PropTypes.objectOf(PropTypes.any),
   }).isRequired,
 };
 
